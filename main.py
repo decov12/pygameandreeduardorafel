@@ -56,8 +56,12 @@ while running:
 
     # Atualizacoes
 
+    keys = pygame.key.get_pressed()
+    player.update(keys)
+
     # Desenhos
     window.fill(WHITE)
-
+    all_sprites.draw(window)
     pygame.display.update()
+    
 pygame.quit()

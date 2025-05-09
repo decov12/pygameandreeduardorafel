@@ -1,8 +1,9 @@
 import pygame
+import random
 from config import WIDTH, HEIGHT, WHITE, FPS
 
 # Iniciar pygame
-pygame.init
+pygame.init()
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Crossy Road")
 clock = pygame.time.Clock()
@@ -38,10 +39,46 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
 
+# classe carro:
+class Carro(pygame.sprite.Sprite):
+    def __init__(self, y, velocidade):
+        super().__init__()
+        self.image = pygame.Surface((60, 40)) 
+        self.image.fill((255, 0, 0)) 
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.velocidade = velocidade
+        
+        if self.velocidade > 0:
+            self.rect.x = -self.rect.width  
+        else:
+            self.rect.x = WIDTH
+    
+    def update(self):
+        self.rect.x += self.velocidade
+
+        # Se o carro saiu da tela, reposiciona
+        if self.velocidade > 0 and self.rect.left > WIDTH:
+            self.rect.right = 0
+        elif self.velocidade < 0 and self.rect.right < 0:
+            self.rect.left = WIDTH
+
 # Criação de objetos 
 player = Player()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
+
+# Criacao carros:
+
+carros = pygame.sprite.Group()
+
+# Criar 5 carros em faixas diferentes
+for i in range(5):
+    y = 100 + i * 80  
+    velocidade = random.choice([3, 4, 5])  
+    carro = Carro(y, velocidade)
+    all_sprites.add(carro)
+    carros.add(carro)
 
 # Loop principal do pygame:
 
@@ -58,10 +95,11 @@ while running:
 
     keys = pygame.key.get_pressed()
     player.update(keys)
+    carros.update()
 
     # Desenhos
     window.fill(WHITE)
     all_sprites.draw(window)
     pygame.display.update()
-    
+
 pygame.quit()

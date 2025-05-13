@@ -1,6 +1,6 @@
 import pygame
 import random
-from config import WIDTH, HEIGHT, WHITE, FPS
+from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT
 
 # Iniciar pygame
 pygame.init()
@@ -8,18 +8,24 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Crossy Road 2.0")
 clock = pygame.time.Clock()
 
-# Imagem do carro
-PLAYER_WIDTH = 60
-PLAYER_HEIGHT = 70
-CAR_WIDTH = 80
-CAR_HEIGHT = 90
-
 assets = {}
 assets['player_image'] = pygame.image.load('assets/Armature_jumping_left_1.png').convert_alpha()
 assets['player_image'] = pygame.transform.scale(assets['player_image'], (PLAYER_WIDTH, PLAYER_HEIGHT))
-assets['car_image'] = pygame.image.load('assets/black car front.png').convert_alpha()
-assets['car_image'] = pygame.transform.scale(assets['car_image'], (CAR_WIDTH, CAR_HEIGHT))
+
+assets['car_black'] = pygame.image.load('assets/black car front.png').convert_alpha()
+assets['car_black'] = pygame.transform.scale(assets['car_black'], (CAR_WIDTH, CAR_HEIGHT))
+assets['car_blue'] = pygame.image.load('assets/blue car front.png').convert_alpha()
+assets['car_blue'] = pygame.transform.scale(assets['car_blue'], (CAR_WIDTH, CAR_HEIGHT))
+assets['car_brown'] = pygame.image.load('assets/brown car front.png').convert_alpha()
+assets['car_brown'] = pygame.transform.scale(assets['car_brown'], (CAR_WIDTH, CAR_HEIGHT))
+assets['car_red'] = pygame.image.load('assets/red car front.png').convert_alpha()
+assets['car_red'] = pygame.transform.scale(assets['car_red'], (CAR_WIDTH, CAR_HEIGHT))
+
 assets['background'] = pygame.image.load('assets/Game Level.png').convert_alpha()
+assets['background'] = pygame.transform.scale(assets['background'], (WIDTH, HEIGHT))
+
+
+available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
 
 # classe do jogador:
 
@@ -53,25 +59,29 @@ class Player(pygame.sprite.Sprite):
 
 # classe carro:
 class Carro(pygame.sprite.Sprite):
-    def __init__(self, y, velocidade, image):
+    def __init__(self, y, vel_x, vel_y, image):
         super().__init__()
-        self.image = assets['car_image']
+        self.image = image
         self.rect = self.image.get_rect()
         self.rect.y = y
-        self.velocidade = velocidade
+        self.vel_y = vel_y
+        self.vel_x = vel_x
         
-        if self.velocidade > 0:
+        if self.vel_x > 0:
             self.rect.x = -self.rect.width  
+
         else:
             self.rect.x = WIDTH
     
     def update(self):
-        self.rect.x += self.velocidade
+        self.rect.x += self.vel_x
+        self.rect.y += self.vel_y
+
 
         # Se o carro saiu da tela, reposiciona
-        if self.velocidade > 0 and self.rect.left > WIDTH:
+        if self.vel_x > 0 and self.rect.left > WIDTH:
             self.rect.right = 0
-        elif self.velocidade < 0 and self.rect.right < 0:
+        elif self.vel_x < 0 and self.rect.right < 0:
             self.rect.left = WIDTH
 
 # Criação de objetos 
@@ -84,10 +94,12 @@ all_sprites.add(player)
 all_cars = pygame.sprite.Group()
 
 # Criar 5 carros em faixas diferentes
-for i in range(5):
-    y = 100 + i * 80  
-    velocidade = random.randint(2,8)
-    carro = Carro(y, velocidade, assets['car_image'])
+faixas_y = [550, 500]
+for y in faixas_y:
+    vel_x = 5
+    vel_y = 0.5
+    car_image = random.choice(available_cars)
+    carro = Carro(y, vel_x, vel_y, assets[car_image])
     all_sprites.add(carro)
     all_cars.add(carro)
 
@@ -104,8 +116,6 @@ while running:
 
     # Atualizacoes
 
-    
-
     keys = pygame.key.get_pressed()
     player.update(keys)
     all_cars.update()
@@ -117,6 +127,7 @@ while running:
 
     # Desenhos
     window.fill(WHITE)
+    window.blit(assets['background'], (0, 0))
     all_sprites.draw(window)
     pygame.display.update()
 

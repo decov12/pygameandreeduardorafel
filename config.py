@@ -1,6 +1,6 @@
 #  TAMANHO DA JANELA 
-WIDTH = 1200
-HEIGHT = 650
+WIDTH = 550
+HEIGHT = 750
 
 # cores
 WHITE = (255, 255, 255)
@@ -14,3 +14,9 @@ FPS = 60
 
 # Velocidade do jogador
 PLAYER_SPEED = 5
+
+# Imagem do carro
+PLAYER_WIDTH = 60
+PLAYER_HEIGHT = 70
+CAR_WIDTH = 80
+CAR_HEIGHT = 90

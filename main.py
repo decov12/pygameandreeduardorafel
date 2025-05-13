@@ -5,16 +5,28 @@ from config import WIDTH, HEIGHT, WHITE, FPS
 # Iniciar pygame
 pygame.init()
 window = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Crossy Road")
+pygame.display.set_caption("Crossy Road 2.0")
 clock = pygame.time.Clock()
+
+# Imagem do carro
+PLAYER_WIDTH = 60
+PLAYER_HEIGHT = 70
+CAR_WIDTH = 80
+CAR_HEIGHT = 90
+
+assets = {}
+assets['player_image'] = pygame.image.load('assets/Armature_jumping_left_1.png').convert_alpha()
+assets['player_image'] = pygame.transform.scale(assets['player_image'], (PLAYER_WIDTH, PLAYER_HEIGHT))
+assets['car_image'] = pygame.image.load('assets/black car front.png').convert_alpha()
+assets['car_image'] = pygame.transform.scale(assets['car_image'], (CAR_WIDTH, CAR_HEIGHT))
+assets['background'] = pygame.image.load('assets/Game Level.png').convert_alpha()
 
 # classe do jogador:
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, image):
         super().__init__()
-        self.image = pygame.Surface((40, 40))
-        self.image.fill((0, 255, 0))
+        self.image = assets['player_image']
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH // 2
         self.rect.bottom = HEIGHT - 10
@@ -41,10 +53,9 @@ class Player(pygame.sprite.Sprite):
 
 # classe carro:
 class Carro(pygame.sprite.Sprite):
-    def __init__(self, y, velocidade):
+    def __init__(self, y, velocidade, image):
         super().__init__()
-        self.image = pygame.Surface((60, 40)) 
-        self.image.fill((255, 0, 0)) 
+        self.image = assets['car_image']
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.velocidade = velocidade
@@ -64,21 +75,21 @@ class Carro(pygame.sprite.Sprite):
             self.rect.left = WIDTH
 
 # Criação de objetos 
-player = Player()
 all_sprites = pygame.sprite.Group()
+
+player = Player(assets['player_image'])
 all_sprites.add(player)
 
 # Criacao carros:
-
-carros = pygame.sprite.Group()
+all_cars = pygame.sprite.Group()
 
 # Criar 5 carros em faixas diferentes
 for i in range(5):
     y = 100 + i * 80  
-    velocidade = random.choice([3, 4, 5])  
-    carro = Carro(y, velocidade)
+    velocidade = random.randint(2,8)
+    carro = Carro(y, velocidade, assets['car_image'])
     all_sprites.add(carro)
-    carros.add(carro)
+    all_cars.add(carro)
 
 # Loop principal do pygame:
 
@@ -93,9 +104,16 @@ while running:
 
     # Atualizacoes
 
+    
+
     keys = pygame.key.get_pressed()
     player.update(keys)
-    carros.update()
+    all_cars.update()
+
+    hits = pygame.sprite.spritecollide(player, all_cars, True)
+
+    if hits:
+        running = False
 
     # Desenhos
     window.fill(WHITE)

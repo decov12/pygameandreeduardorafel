@@ -1,49 +1,51 @@
 import pygame
 import random
 from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT
-
 # Iniciar pygame
 pygame.init()
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Crossy Road 2.0")
 clock = pygame.time.Clock()
 
+
+import pygame
+import random
+from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, WOOD_WIDTH, WOOD_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT
+
 assets = {}
-assets['player_image'] = pygame.image.load('assets/Armature_jumping_right_1.png').convert_alpha()
+assets['player_image'] = pygame.image.load('Assets/Armature_jumping_left_1.png').convert_alpha()
 assets['player_image'] = pygame.transform.scale(assets['player_image'], (PLAYER_WIDTH, PLAYER_HEIGHT))
-
-assets['car_black'] = pygame.image.load('assets/black car front.png').convert_alpha()
+assets['tree_log']=pygame.image.load('Assets/objects/the wood.png').convert_alpha()
+assets['tree_log']=pygame.transform.scale(assets['tree_log'], (WOOD_WIDTH,WOOD_HEIGHT))
+assets['background'] = pygame.image.load('Assets/Game Level.png').convert_alpha()
+assets['player_image'] = pygame.image.load('Assets/Armature_jumping_right_1.png').convert_alpha()
+assets['player_image'] = pygame.transform.scale(assets['player_image'], (PLAYER_WIDTH, PLAYER_HEIGHT))
+assets['car_black'] = pygame.image.load('Assets/black car front.png').convert_alpha()
 assets['car_black'] = pygame.transform.scale(assets['car_black'], (CAR_WIDTH, CAR_HEIGHT))
-assets['car_blue'] = pygame.image.load('assets/blue car front.png').convert_alpha()
+assets['car_blue'] = pygame.image.load('Assets/blue car front.png').convert_alpha()
 assets['car_blue'] = pygame.transform.scale(assets['car_blue'], (CAR_WIDTH, CAR_HEIGHT))
-assets['car_brown'] = pygame.image.load('assets/brown car front.png').convert_alpha()
+assets['car_brown'] = pygame.image.load('Assets/brown car front.png').convert_alpha()
 assets['car_brown'] = pygame.transform.scale(assets['car_brown'], (CAR_WIDTH, CAR_HEIGHT))
-assets['car_red'] = pygame.image.load('assets/red car front.png').convert_alpha()
+assets['car_red'] = pygame.image.load('Assets/red car front.png').convert_alpha()
 assets['car_red'] = pygame.transform.scale(assets['car_red'], (CAR_WIDTH, CAR_HEIGHT))
-
-assets['background'] = pygame.image.load('assets/Game Level.png').convert_alpha()
-assets['background'] = pygame.transform.scale(assets['background'], (WIDTH, HEIGHT))
-
-assets['grass'] = pygame.image.load('assets/Grass2').convert_alpha()
+assets['grass'] = pygame.image.load('Assets/Roads/Grass2.png').convert_alpha()
 assets['grass'] = pygame.transform.scale(assets['grass'], (ROAD_WIDTH, ROAD_HEIGHT))
-assets['railway'] = pygame.image.load('assets/railway2').convert_alpha()
+assets['railway'] = pygame.image.load('Assets/Roads/railway2.png').convert_alpha()
 assets['railway'] = pygame.transform.scale(assets['railway'], (ROAD_WIDTH, ROAD_HEIGHT))
-assets['sidewalk'] = pygame.image.load('assets/sidewalk2').convert_alpha()
+assets['sidewalk'] = pygame.image.load('Assets/Roads/sidewalk2.png').convert_alpha()
 assets['sidewalk'] = pygame.transform.scale(assets['sidewalk'], (ROAD_WIDTH, ROAD_HEIGHT))
-assets['street'] = pygame.image.load('assets/Street1.2').convert_alpha()
+assets['street'] = pygame.image.load('Assets/Roads/Street1.2.png').convert_alpha()
 assets['street'] = pygame.transform.scale(assets['street'], (ROAD_WIDTH, ROAD_HEIGHT))
-assets['street2'] = pygame.image.load('assets/Street2.2').convert_alpha()
+assets['street2'] = pygame.image.load('Assets/Roads/Street2.2.png').convert_alpha()
 assets['street2'] = pygame.transform.scale(assets['street2'], (ROAD_WIDTH, ROAD_HEIGHT))
-assets['water'] = pygame.image.load('assets/Water2').convert_alpha()
+assets['water'] = pygame.image.load('Assets/Roads/Water2.png').convert_alpha()
 assets['water'] = pygame.transform.scale(assets['water'], (ROAD_WIDTH, ROAD_HEIGHT))
 
+available_backgrounds = ['grass','railway', 'sidewalk', 'street', 'street2', 'water']
 
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
 
 lista_backgrounds = ['grass', 'railway', 'sidewalk', 'street', 'street2', 'water']
-
-# for background in lista_backgrounds:
-
 
 # classe do jogador:
 
@@ -101,16 +103,25 @@ scroll_speed = 2
 
 class Background(pygame.sprite.Sprite):
     def __init__ (self, tipo, y):
+        super().__init__()
         self.image = assets[tipo]
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = 0
-        scroll_speed = 2
+        self.scroll_speed = 2
     
-    def update(self):
-        self.rect.y += scroll_speed
+    def update(self,direcao):
+        if direcao == "frente":
+            self.rect.y += self.scroll_speed
+        else:
+            self.rect.y -= self.scroll_speed
         
 
+backgrounds = pygame.sprite.Group()
+
+for i in range(-5,5):
+    bg = Background(random.choice(available_backgrounds), i * 150 )
+    backgrounds.add(bg)
 
     
 
@@ -142,6 +153,7 @@ while running:
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
+                backgrounds.update("frente")
                 player.move_by(+15, -40)
             elif event.key == pygame.K_LEFT:
                 player.move_by(-30, -5)
@@ -172,7 +184,7 @@ while running:
 
     # Desenhos
     window.fill(WHITE)
-    window.blit(assets['background'], (0, 0))
+    backgrounds.draw(window)
     all_sprites.draw(window)
     pygame.display.update()
 

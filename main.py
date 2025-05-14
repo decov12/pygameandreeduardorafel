@@ -1,6 +1,6 @@
 import pygame
 import random
-from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT
+from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT
 
 # Iniciar pygame
 pygame.init()
@@ -9,7 +9,7 @@ pygame.display.set_caption("Crossy Road 2.0")
 clock = pygame.time.Clock()
 
 assets = {}
-assets['player_image'] = pygame.image.load('assets/Armature_jumping_left_1.png').convert_alpha()
+assets['player_image'] = pygame.image.load('assets/Armature_jumping_right_1.png').convert_alpha()
 assets['player_image'] = pygame.transform.scale(assets['player_image'], (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 assets['car_black'] = pygame.image.load('assets/black car front.png').convert_alpha()
@@ -24,8 +24,26 @@ assets['car_red'] = pygame.transform.scale(assets['car_red'], (CAR_WIDTH, CAR_HE
 assets['background'] = pygame.image.load('assets/Game Level.png').convert_alpha()
 assets['background'] = pygame.transform.scale(assets['background'], (WIDTH, HEIGHT))
 
+assets['grass'] = pygame.image.load('assets/Grass2').convert_alpha()
+assets['grass'] = pygame.transform.scale(assets['grass'], (ROAD_WIDTH, ROAD_HEIGHT))
+assets['railway'] = pygame.image.load('assets/railway2').convert_alpha()
+assets['railway'] = pygame.transform.scale(assets['railway'], (ROAD_WIDTH, ROAD_HEIGHT))
+assets['sidewalk'] = pygame.image.load('assets/sidewalk2').convert_alpha()
+assets['sidewalk'] = pygame.transform.scale(assets['sidewalk'], (ROAD_WIDTH, ROAD_HEIGHT))
+assets['street'] = pygame.image.load('assets/Street1.2').convert_alpha()
+assets['street'] = pygame.transform.scale(assets['street'], (ROAD_WIDTH, ROAD_HEIGHT))
+assets['street2'] = pygame.image.load('assets/Street2.2').convert_alpha()
+assets['street2'] = pygame.transform.scale(assets['street2'], (ROAD_WIDTH, ROAD_HEIGHT))
+assets['water'] = pygame.image.load('assets/Water2').convert_alpha()
+assets['water'] = pygame.transform.scale(assets['water'], (ROAD_WIDTH, ROAD_HEIGHT))
+
 
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
+
+lista_backgrounds = ['grass', 'railway', 'sidewalk', 'street', 'street2', 'water']
+
+# for background in lista_backgrounds:
+
 
 # classe do jogador:
 
@@ -79,6 +97,23 @@ class Carro(pygame.sprite.Sprite):
         elif self.vel_x < 0 and self.rect.right < 0:
             self.rect.left = WIDTH
 
+scroll_speed = 2
+
+class Background(pygame.sprite.Sprite):
+    def __init__ (self, tipo, y):
+        self.image = assets[tipo]
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = 0
+        scroll_speed = 2
+    
+    def update(self):
+        self.rect.y += scroll_speed
+        
+
+
+    
+
 # Criação de objetos 
 all_sprites = pygame.sprite.Group()
 
@@ -89,16 +124,12 @@ all_sprites.add(player)
 all_cars = pygame.sprite.Group()
 
 # Criar 5 carros em faixas diferentes
-faixas_y = [550, 500]
-for y in faixas_y:
-    vel_x = 5
-    vel_y = 0.5
-    car_image = random.choice(available_cars)
-    carro = Carro(y, vel_x, vel_y, assets[car_image])
-    all_sprites.add(carro)
-    all_cars.add(carro)
+faixas_y = [420, 430]
 
 # Loop principal do pygame:
+
+last_car_emitido = 0
+intervalo_cars_emitidos = 2000
 
 running = True
 while running:
@@ -118,6 +149,19 @@ while running:
                 player.move_by(+30, +5)
             elif event.key == pygame.K_DOWN:
                 player.move_by(-15, +40)
+        
+        now = pygame.time.get_ticks()
+
+        if now - last_car_emitido > intervalo_cars_emitidos:
+            y = random.choice(faixas_y)
+            vel_x = 5
+            vel_y = 0.5
+            car_image = random.choice(available_cars)
+            carro = Carro(y, vel_x, vel_y, assets[car_image])
+            all_sprites.add(carro)
+            all_cars.add(carro)
+            last_car_emitido = now
+
 
     # Atualizações
     all_cars.update()

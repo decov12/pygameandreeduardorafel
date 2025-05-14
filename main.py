@@ -37,17 +37,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH // 2
         self.rect.bottom = HEIGHT - 10
 
-    def update (self, keys):
-        if keys[pygame.K_LEFT]:
-            self.rect.x -= 5
-        if keys[pygame.K_RIGHT]:
-            self.rect.x += 5
-        if keys[pygame.K_UP]:
-            self.rect.y -= 5
-        if keys[pygame.K_DOWN]:
-            self.rect.y += 5
+    def move_by(self, dx, dy):
+        self.rect.x += dx
+        self.rect.y += dy
 
-        # manter na tela
+        # manter dentro da tela
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > WIDTH:
@@ -56,6 +50,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
+
 
 # classe carro:
 class Carro(pygame.sprite.Sprite):
@@ -114,14 +109,20 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # Atualizacoes
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                player.move_by(+15, -40)
+            elif event.key == pygame.K_LEFT:
+                player.move_by(-30, -5)
+            elif event.key == pygame.K_RIGHT:
+                player.move_by(+30, +5)
+            elif event.key == pygame.K_DOWN:
+                player.move_by(-15, +40)
 
-    keys = pygame.key.get_pressed()
-    player.update(keys)
+    # Atualizações
     all_cars.update()
 
     hits = pygame.sprite.spritecollide(player, all_cars, True)
-
     if hits:
         running = False
 

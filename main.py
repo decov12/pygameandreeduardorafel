@@ -41,11 +41,11 @@ assets['street2'] = pygame.transform.scale(assets['street2'], (ROAD_WIDTH, ROAD_
 assets['water'] = pygame.image.load('Assets/Roads/Water2.png').convert_alpha()
 assets['water'] = pygame.transform.scale(assets['water'], (ROAD_WIDTH, ROAD_HEIGHT))
 
-available_backgrounds = ['grass','railway', 'sidewalk', 'street', 'street2', 'water']
+available_backgrounds = ['grass','railway', 'sidewalk', 'street', 'water']
 
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
 
-lista_backgrounds = ['grass', 'railway', 'sidewalk', 'street', 'street2', 'water']
+lista_backgrounds = ['grass', 'railway', 'sidewalk', 'street', 'water']
 
 # classe do jogador:
 

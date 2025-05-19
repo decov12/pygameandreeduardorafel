@@ -55,7 +55,7 @@ class Player(pygame.sprite.Sprite):
         self.image = assets['player_image']
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH // 2
-        self.rect.bottom = HEIGHT - 10
+        self.rect.centery = HEIGHT // 2
 
     def move_by(self, dx, dy):
         self.rect.x += dx
@@ -70,6 +70,9 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
+        
+    def update(self):
+        self.rect.y += 1
 
 
 # classe carro:
@@ -81,6 +84,7 @@ class Carro(pygame.sprite.Sprite):
         self.rect.y = y
         self.vel_y = vel_y
         self.vel_x = vel_x
+        self.pos = y * 1.0
         
         if self.vel_x > 0:
             self.rect.x = -self.rect.width  
@@ -90,8 +94,8 @@ class Carro(pygame.sprite.Sprite):
     
     def update(self):
         self.rect.x += self.vel_x
-        self.rect.y += self.vel_y
-
+        self.pos += 1.5
+        self.rect.y = self.pos
 
         # Se o carro saiu da tela, reposiciona
         if self.vel_x > 0 and self.rect.left > WIDTH:
@@ -99,31 +103,26 @@ class Carro(pygame.sprite.Sprite):
         elif self.vel_x < 0 and self.rect.right < 0:
             self.rect.left = WIDTH
 
-scroll_speed = 2
 
 class Background(pygame.sprite.Sprite):
-    def __init__ (self, tipo, y):
+    def __init__ (self, vel_y,  tipo, y):
         super().__init__()
         self.image = assets[tipo]
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = 0
-        self.scroll_speed = 2
+        self.vel_y = vel_y
+        self.scroll_speed = 1
     
-    def update(self,direcao):
-        if direcao == "frente":
-            self.rect.y += self.scroll_speed
-        else:
-            self.rect.y -= self.scroll_speed
-        
+    def update(self):
+        self.rect.y += self.scroll_speed
+
 
 backgrounds = pygame.sprite.Group()
 
 for i in range(-5,5):
-    bg = Background(random.choice(available_backgrounds), i * 150 )
+    bg = Background(5, random.choice(available_backgrounds), i * 150 )
     backgrounds.add(bg)
-
-    
 
 # Criação de objetos 
 all_sprites = pygame.sprite.Group()
@@ -153,7 +152,6 @@ while running:
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                backgrounds.update("frente")
                 player.move_by(+15, -40)
             elif event.key == pygame.K_LEFT:
                 player.move_by(-30, -5)
@@ -164,19 +162,22 @@ while running:
         
         now = pygame.time.get_ticks()
 
-        if now - last_car_emitido > intervalo_cars_emitidos:
-            y = random.choice(faixas_y)
-            vel_x = 5
-            vel_y = 0.5
-            car_image = random.choice(available_cars)
-            carro = Carro(y, vel_x, vel_y, assets[car_image])
-            all_sprites.add(carro)
-            all_cars.add(carro)
-            last_car_emitido = now
+        if Background.image in ['street', 'street2']:
+            if now - last_car_emitido > intervalo_cars_emitidos:
+                y = random.choice(faixas_y)
+                vel_x = 5
+                vel_y = 1
+                car_image = random.choice(available_cars)
+                carro = Carro(y, vel_x, vel_y, assets[car_image])
+                all_sprites.add(carro)
+                all_cars.add(carro)
+                last_car_emitido = now
 
 
     # Atualizações
     all_cars.update()
+    backgrounds.update()
+    player.update()
 
     hits = pygame.sprite.spritecollide(player, all_cars, True)
     if hits:

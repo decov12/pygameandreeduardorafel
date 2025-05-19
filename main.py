@@ -32,16 +32,15 @@ assets['grass'] = pygame.image.load('Assets/Roads/Grass.png').convert_alpha()
 assets['grass'] = pygame.transform.scale(assets['grass'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['railway'] = pygame.image.load('Assets/Roads/railway2.png').convert_alpha()
 assets['railway'] = pygame.transform.scale(assets['railway'], (ROAD_WIDTH, ROAD_HEIGHT))
-assets['sidewalk'] = pygame.image.load('Assets/Roads/sidewalk2.png').convert_alpha()
-assets['sidewalk'] = pygame.transform.scale(assets['sidewalk'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['street'] = pygame.image.load('Assets/Roads/Street1.2.png').convert_alpha()
+assets['street'] = pygame.transform.scale(assets['street'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['street'] = pygame.transform.scale(assets['street'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['street2'] = pygame.image.load('Assets/Roads/Street2.2.png').convert_alpha()
 assets['street2'] = pygame.transform.scale(assets['street2'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['water'] = pygame.image.load('Assets/Roads/Water2.png').convert_alpha()
 assets['water'] = pygame.transform.scale(assets['water'], (ROAD_WIDTH, ROAD_HEIGHT))
 
-available_backgrounds = ['grass','railway', 'sidewalk','street2', 'water']
+available_backgrounds = ['grass','railway','street2', 'water']
 
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
 
@@ -98,24 +97,30 @@ class Carro(pygame.sprite.Sprite):
         self.rect.y = self.pos
 
 class Background(pygame.sprite.Sprite):
-    def __init__ (self, vel_y,  tipo, y):
+    def __init__ (self, tipo, y):
         super().__init__()
         self.image = assets[tipo]
         self.rect = self.image.get_rect()
         self.tipo = tipo
         self.rect.y = y
         self.rect.x = 0
-        self.vel_y = vel_y
         self.scroll_speed = 1
     
     def update(self):
         self.rect.y += self.scroll_speed
 
+        if self.rect.top > HEIGHT:
+            self.kill()
+
+        if self.rect.top == -HEIGHT:
+            self.rect.y = HEIGHT
+
 backgrounds = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_cars = pygame.sprite.Group()
+
 for i in range(-10, 10):
-    bg = Background(5, random.choice(available_backgrounds), i * 150 )
+    bg = Background(random.choice(available_backgrounds), i * 150 )
     if bg.tipo in ['street', 'street2']:
         car_image = random.choice(available_cars)
         carro = Carro(bg.rect.y, 5, 1, assets[car_image])
@@ -126,11 +131,8 @@ for i in range(-10, 10):
 
 # Criação de objetos 
 
-
 player = Player(assets['player_image'])
 all_sprites.add(player)
-
-
 
 # Loop principal do pygame:
 
@@ -172,7 +174,18 @@ while running:
                 all_sprites.add(carro)
                 all_cars.add(carro)
 
-    print(len(all_cars))
+    if len(backgrounds) < 10:
+        bg_image = random.choice(available_backgrounds)
+        bg = Background(bg_image, backgrounds.sprites()[0].rect.y - 150)
+        backgrounds.add(bg)
+
+    
+    # for bg in backgrounds:
+        # if bg.rect.bottom > HEIGHT:
+        #     bg.kill()
+        #     bg_image = random.choice(available_backgrounds)
+        #     bg = Background(assets[bg_image])
+        #     backgrounds.add(bg)
 
     # Atualizações
     all_cars.update()
@@ -189,4 +202,5 @@ while running:
     all_sprites.draw(window)
     pygame.display.update()
 
+    
 pygame.quit()

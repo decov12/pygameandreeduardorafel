@@ -97,13 +97,6 @@ class Carro(pygame.sprite.Sprite):
         self.pos += 1.5
         self.rect.y = self.pos
 
-        # Se o carro saiu da tela, reposiciona
-        if self.vel_x > 0 and self.rect.left > WIDTH:
-            self.rect.right = 0
-        elif self.vel_x < 0 and self.rect.right < 0:
-            self.rect.left = WIDTH
-
-
 class Background(pygame.sprite.Sprite):
     def __init__ (self, vel_y,  tipo, y):
         super().__init__()
@@ -119,22 +112,25 @@ class Background(pygame.sprite.Sprite):
         self.rect.y += self.scroll_speed
 
 backgrounds = pygame.sprite.Group()
-
+all_sprites = pygame.sprite.Group()
+all_cars = pygame.sprite.Group()
 for i in range(-10, 10):
     bg = Background(5, random.choice(available_backgrounds), i * 150 )
+    if bg.tipo in ['street', 'street2']:
+        car_image = random.choice(available_cars)
+        carro = Carro(bg.rect.y, 5, 1, assets[car_image])
+        all_sprites.add(carro)
+        all_cars.add(carro)
+
     backgrounds.add(bg)
 
 # Criação de objetos 
-all_sprites = pygame.sprite.Group()
+
 
 player = Player(assets['player_image'])
 all_sprites.add(player)
 
-# Criacao carros:
-all_cars = pygame.sprite.Group()
 
-# Criar 5 carros em faixas diferentes
-faixas_y = [420, 430]
 
 # Loop principal do pygame:
 
@@ -162,17 +158,21 @@ while running:
         
         now = pygame.time.get_ticks()
 
-        if bg.tipo == 'street' or bg.tipo == 'street2':
-            if now - last_car_emitido > intervalo_cars_emitidos:
-                y = random.choice(faixas_y)
-                vel_x = 5
-                vel_y = 1
+    novo_carro = False
+    for car in all_cars:
+        if car.rect.left > WIDTH:
+            car.kill()
+            novo_carro = True
+    if novo_carro:
+        novo_carro = False
+        for bg in backgrounds:
+            if bg.tipo in ['street', 'street2']:
                 car_image = random.choice(available_cars)
-                carro = Carro(y, vel_x, vel_y, assets[car_image])
+                carro = Carro(bg.rect.y, 5, 1, assets[car_image])
                 all_sprites.add(carro)
                 all_cars.add(carro)
-                last_car_emitido = now
 
+    print(len(all_cars))
 
     # Atualizações
     all_cars.update()

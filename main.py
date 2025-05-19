@@ -109,6 +109,7 @@ class Background(pygame.sprite.Sprite):
         super().__init__()
         self.image = assets[tipo]
         self.rect = self.image.get_rect()
+        self.tipo = tipo
         self.rect.y = y
         self.rect.x = 0
         self.vel_y = vel_y
@@ -117,10 +118,9 @@ class Background(pygame.sprite.Sprite):
     def update(self):
         self.rect.y += self.scroll_speed
 
-
 backgrounds = pygame.sprite.Group()
 
-for i in range(-5,5):
+for i in range(-10, 10):
     bg = Background(5, random.choice(available_backgrounds), i * 150 )
     backgrounds.add(bg)
 
@@ -162,7 +162,7 @@ while running:
         
         now = pygame.time.get_ticks()
 
-        if Background.image in ['street', 'street2']:
+        if bg.tipo == 'street' or bg.tipo == 'street2':
             if now - last_car_emitido > intervalo_cars_emitidos:
                 y = random.choice(faixas_y)
                 vel_x = 5

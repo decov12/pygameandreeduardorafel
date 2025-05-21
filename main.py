@@ -1,6 +1,6 @@
 import pygame
 import random
-from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT, TRAIN_WIDTH, TRAIN_HEIGHT, GREEN2, TREE_LOG_WIDTH, TREE_LOG_HEIGHT
+from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT, TRAIN_WIDTH, TRAIN_HEIGHT, GREEN2, TREE_LOG_WIDTH, TREE_LOG_HEIGHT,TRAIN_HITBOX_WIDTH, TRAIN_HITBOX_HEIGHT
 
 # Iniciar pygame
 pygame.init()
@@ -136,8 +136,10 @@ class Carro(pygame.sprite.Sprite):
 class Train(pygame.sprite.Sprite):
     def __init__(self, y, vel_x, vel_y, image):
         super().__init__()
-        self.image = image
+        self.image = pygame.transform.scale(image, (TRAIN_WIDTH, TRAIN_HEIGHT))
         self.rect = self.image.get_rect()
+        # Crie um retângulo de colisão menor que a imagem
+        self.hitbox = pygame.Rect(0, 0, TRAIN_HITBOX_WIDTH, TRAIN_HITBOX_HEIGHT)
         self.rect.y = y
         self.vel_y = vel_y
         self.vel_x = vel_x
@@ -152,6 +154,8 @@ class Train(pygame.sprite.Sprite):
         self.rect.x += self.vel_x
         self.pos += 1.5
         self.rect.y = self.pos
+        # Atualize a posição do hitbox para acompanhar o trem
+        self.hitbox.center = self.rect.center
 
 class Tree_log(pygame.sprite.Sprite):
     def __init__(self, y, vel_x, vel_y, image):
@@ -345,7 +349,11 @@ def game():
         player.update()
 
         hits = pygame.sprite.spritecollide(player, all_cars, True)
-        hits2 = pygame.sprite.spritecollide(player, all_trains, True)
+        hits2 = []
+        for train in all_trains:
+            if player.rect.colliderect(train.hitbox):
+                hits2.append(train)
+                train.kill()
 
         if hits or hits2:
             score = abs(player.rect.y // 40)  # exemplo de score com base na subida

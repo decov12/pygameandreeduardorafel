@@ -267,7 +267,7 @@ while running:
                 tree_log_image = assets['tree_log']
                 tree_log = Tree_log(bg.rect.y, 5, 1, tree_log_image)
                 all_sprites.add(tree_log)
-                all_trains.add(tree_log)
+                all_tree_log.add(tree_log)
 
     novo_bg = False
     for bg in backgrounds:

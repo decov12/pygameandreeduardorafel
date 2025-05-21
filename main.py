@@ -1,6 +1,6 @@
 import pygame
 import random
-from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT
+from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT, TRAIN_WIDTH, TRAIN_HEIGHT, GREEN2 
 # Iniciar pygame
 pygame.init()
 window = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -28,8 +28,6 @@ assets['car_brown'] = pygame.image.load('Assets/brown car front.png').convert_al
 assets['car_brown'] = pygame.transform.scale(assets['car_brown'], (CAR_WIDTH, CAR_HEIGHT))
 assets['car_red'] = pygame.image.load('Assets/red car front.png').convert_alpha()
 assets['car_red'] = pygame.transform.scale(assets['car_red'], (CAR_WIDTH, CAR_HEIGHT))
-assets['grass'] = pygame.image.load('Assets/Roads/Grass.png').convert_alpha()
-assets['grass'] = pygame.transform.scale(assets['grass'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['railway'] = pygame.image.load('Assets/Roads/railway2.png').convert_alpha()
 assets['railway'] = pygame.transform.scale(assets['railway'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['street'] = pygame.image.load('Assets/Roads/Street1.2.png').convert_alpha()
@@ -39,12 +37,14 @@ assets['street2'] = pygame.image.load('Assets/Roads/Street2.2.png').convert_alph
 assets['street2'] = pygame.transform.scale(assets['street2'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['water'] = pygame.image.load('Assets/Roads/Water2.png').convert_alpha()
 assets['water'] = pygame.transform.scale(assets['water'], (ROAD_WIDTH, ROAD_HEIGHT))
+assets['train'] = pygame.image.load('Assets/train front.png').convert_alpha()
+assets['train'] = pygame.transform.scale(assets['water'], (TRAIN_WIDTH, TRAIN_HEIGHT))
 
-available_backgrounds = ['grass','railway','street2', 'water']
+available_backgrounds = ['railway','street2', 'water']
 
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
 
-lista_backgrounds = ['grass', 'railway', 'sidewalk', 'street2', 'water']
+lista_backgrounds = ['railway', 'sidewalk', 'street2', 'water']
 
 # classe do jogador:
 
@@ -96,36 +96,60 @@ class Carro(pygame.sprite.Sprite):
         self.pos += 1.5
         self.rect.y = self.pos
 
+class Train(pygame.sprite.Sprite):
+    def __init__(self, y, vel_x, vel_y, image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.vel_y = vel_y
+        self.vel_x = vel_x
+        self.pos = y * 1.0
+        
+        if self.vel_x > 0:
+            self.rect.x = -self.rect.width  
+
+        else:
+            self.rect.x = WIDTH
+    
+    def update(self):
+        self.rect.x += self.vel_x
+        self.pos += 1.5
+        self.rect.y = self.pos
+
 class Background(pygame.sprite.Sprite):
-    def __init__ (self, tipo, y):
+    def __init__ (self, tipo, y, id):
         super().__init__()
         self.image = assets[tipo]
         self.rect = self.image.get_rect()
         self.tipo = tipo
         self.rect.y = y
         self.rect.x = 0
+        self.id = id
         self.scroll_speed = 1
     
     def update(self):
         self.rect.y += self.scroll_speed
 
-        if self.rect.top > HEIGHT:
-            self.kill()
-
-        if self.rect.top == -HEIGHT:
-            self.rect.y = HEIGHT
 
 backgrounds = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_cars = pygame.sprite.Group()
+all_trains = pygame.sprite.Group()
 
 for i in range(-10, 10):
-    bg = Background(random.choice(available_backgrounds), i * 150 )
+    bg = Background(random.choice(available_backgrounds), i * 150 , i)
     if bg.tipo in ['street', 'street2']:
         car_image = random.choice(available_cars)
         carro = Carro(bg.rect.y, 5, 1, assets[car_image])
         all_sprites.add(carro)
         all_cars.add(carro)
+    
+    # if bg.tipo in ['railway']:
+    #     train_image = assets['train']
+    #     train = Train(bg.rect.y, 5, 1, assets[train_image])
+    #     all_sprites.add(train)
+    #     all_trains.add(train)
 
     backgrounds.add(bg)
 
@@ -161,10 +185,15 @@ while running:
         now = pygame.time.get_ticks()
 
     novo_carro = False
+    kill_cars = False
     for car in all_cars:
         if car.rect.left > WIDTH:
-            car.kill()
+            kill_cars = True
             novo_carro = True
+    if kill_cars:
+        for car in all_cars:
+            car.kill()
+        kill_cars = False
     if novo_carro:
         novo_carro = False
         for bg in backgrounds:
@@ -173,31 +202,72 @@ while running:
                 carro = Carro(bg.rect.y, 5, 1, assets[car_image])
                 all_sprites.add(carro)
                 all_cars.add(carro)
-
-    if len(backgrounds) < 10:
-        bg_image = random.choice(available_backgrounds)
-        bg = Background(bg_image, backgrounds.sprites()[0].rect.y - 150)
-        backgrounds.add(bg)
-
     
-    # for bg in backgrounds:
-        # if bg.rect.bottom > HEIGHT:
-        #     bg.kill()
-        #     bg_image = random.choice(available_backgrounds)
-        #     bg = Background(assets[bg_image])
-        #     backgrounds.add(bg)
+    # novo_train = False
+    # kill_trains = False
+    # for train in all_trains:
+    #     if train.rect.left > WIDTH:
+    #         kill_trains = True
+    #         novo_train = True
+    # if kill_trains:
+    #     for train in all_trains:
+    #         train.kill()
+    #     kill_trains = False
+    # if novo_train:
+    #     novo_train = False    
+    #     for bg in backgrounds:
+    #         if bg.tipo in ['railway']:
+    #             train_image = assets['train']
+    #             train = Train(bg.rect.y, 5, 1, assets[train_image])
+    #             all_sprites.add(train)
+    #             all_trains.add(train)
+
+    novo_bg = False
+    for bg in backgrounds:
+        if bg.rect.bottom > HEIGHT + 150:
+            print("bg ",bg.rect.bottom, bg.tipo, bg.id)
+            bg.kill()
+            novo_bg = True  
+    if novo_bg:
+        novo_bg = False
+        bg_image = random.choice(available_backgrounds)
+        max_y = 0
+        for back in backgrounds:
+            if max_y > back.rect.y:
+                max_y = back.rect.y
+        y = max_y - 150
+        bg = Background(random.choice(available_backgrounds), y , "novo")
+        
+        if bg.tipo in ['street', 'street2']:
+            car_image = random.choice(available_cars)
+            carro = Carro(bg.rect.y, 5, 1, assets[car_image])
+            all_sprites.add(carro)
+            all_cars.add(carro)
+        
+        # if bg.tipo in ['railway']:
+        #     train_image = assets['train']
+        #     train = Train(bg.rect.y, 5, 1, train_image)
+        #     all_sprites.add(train)
+        #     all_trains.add(train)
+
+        backgrounds.add(bg)
+    
+
 
     # Atualizações
     all_cars.update()
+    all_trains.update()
     backgrounds.update()
     player.update()
 
     hits = pygame.sprite.spritecollide(player, all_cars, True)
-    if hits:
+    hits2= pygame.sprite.spritecollide(player, all_trains, True)
+
+    if hits or hits2:
         running = False
 
     # Desenhos
-    window.fill(WHITE)
+    window.fill(GREEN2)
     backgrounds.draw(window)
     all_sprites.draw(window)
     pygame.display.update()

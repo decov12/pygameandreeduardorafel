@@ -10,13 +10,13 @@ clock = pygame.time.Clock()
 
 import pygame
 import random
-from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, WOOD_WIDTH, WOOD_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT
+from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, WOOD_WIDTH, WOOD_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT, TREE_LOG_WIDTH, TREE_LOG_HEIGHT
 
 assets = {}
 assets['player_image'] = pygame.image.load('Assets/Armature_jumping_left_1.png').convert_alpha()
 assets['player_image'] = pygame.transform.scale(assets['player_image'], (PLAYER_WIDTH, PLAYER_HEIGHT))
 assets['tree_log']=pygame.image.load('Assets/objects/the wood.png').convert_alpha()
-assets['tree_log']=pygame.transform.scale(assets['tree_log'], (WOOD_WIDTH,WOOD_HEIGHT))
+assets['tree_log']=pygame.transform.scale(assets['tree_log'], (TREE_LOG_WIDTH, TREE_LOG_HEIGHT))
 assets['background'] = pygame.image.load('Assets/Game Level.png').convert_alpha()
 assets['player_image'] = pygame.image.load('Assets/Armature_jumping_right_1.png').convert_alpha()
 assets['player_image'] = pygame.transform.scale(assets['player_image'], (PLAYER_WIDTH, PLAYER_HEIGHT))
@@ -155,7 +155,7 @@ backgrounds = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_cars = pygame.sprite.Group()
 all_trains = pygame.sprite.Group()
-# all_treelog = pygame.sprite.Group()
+all_tree_log = pygame.sprite.Group()
 
 for i in range(-10, 10):
     bg = Background(random.choice(available_backgrounds), i * 150 , i)
@@ -171,6 +171,12 @@ for i in range(-10, 10):
         train = Train(bg.rect.y, 5, 1, train_image)
         all_sprites.add(train)
         all_trains.add(train)
+    
+    if bg.tipo in ['water']:
+        tree_log_image = assets['tree_log']
+        tree_log = Train(bg.rect.y, 5, 1, tree_log_image)
+        all_sprites.add(tree_log)
+        all_tree_log.add(tree_log)
 
     backgrounds.add(bg)
 
@@ -242,6 +248,26 @@ while running:
                 train = Train(bg.rect.y, 5, 1, train_image)
                 all_sprites.add(train)
                 all_trains.add(train)
+        novo_train = False
+
+    novo_tree_log = False
+    kill_tree_log = False
+    for tree_log in all_tree_log:
+        if tree_log.rect.left > WIDTH:
+            kill_trains = True
+            novo_train = True
+    if kill_tree_log:
+        for tree_log in all_trains:
+            tree_log.kill()
+        kill_tree_log = False
+    if novo_tree_log:
+        novo_tree_log = False    
+        for bg in backgrounds:
+            if bg.tipo in ['railway']:
+                tree_log_image = assets['tree_log']
+                tree_log = Tree_log(bg.rect.y, 5, 1, tree_log_image)
+                all_sprites.add(tree_log)
+                all_trains.add(tree_log)
 
     novo_bg = False
     for bg in backgrounds:
@@ -270,14 +296,19 @@ while running:
             train = Train(bg.rect.y, 5, 1, train_image)
             all_sprites.add(train)
             all_trains.add(train)
+        
+        if bg.tipo in ['water']:
+            tree_log_image = assets['tree_log']
+            tree_log = Train(bg.rect.y, 5, 1, tree_log_image)
+            all_sprites.add(tree_log)
+            all_tree_log.add(tree_log)
 
         backgrounds.add(bg)
     
-
-
     # Atualizações
     all_cars.update()
     all_trains.update()
+    all_tree_log.update()
     backgrounds.update()
     player.update()
 

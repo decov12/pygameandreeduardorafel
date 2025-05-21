@@ -38,13 +38,11 @@ assets['street2'] = pygame.transform.scale(assets['street2'], (ROAD_WIDTH, ROAD_
 assets['water'] = pygame.image.load('Assets/Roads/Water2.png').convert_alpha()
 assets['water'] = pygame.transform.scale(assets['water'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['train'] = pygame.image.load('Assets/train front.png').convert_alpha()
-assets['train'] = pygame.transform.scale(assets['water'], (TRAIN_WIDTH, TRAIN_HEIGHT))
+assets['train'] = pygame.transform.scale(assets['train'], (TRAIN_WIDTH, TRAIN_HEIGHT))
 
-available_backgrounds = ['railway','street2', 'water']
+available_backgrounds = ['railway','street2', 'water', 'street2']
 
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
-
-lista_backgrounds = ['railway', 'sidewalk', 'street2', 'water']
 
 # classe do jogador:
 
@@ -117,6 +115,27 @@ class Train(pygame.sprite.Sprite):
         self.pos += 1.5
         self.rect.y = self.pos
 
+class Tree_log(pygame.sprite.Sprite):
+    def __init__(self, y, vel_x, vel_y, image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.vel_y = vel_y
+        self.vel_x = vel_x
+        self.pos = y * 1.0
+        
+        if self.vel_x > 0:
+            self.rect.x = -self.rect.width  
+
+        else:
+            self.rect.x = WIDTH
+    
+    def update(self):
+        self.rect.x += self.vel_x
+        self.pos += 1.5
+        self.rect.y = self.pos
+
 class Background(pygame.sprite.Sprite):
     def __init__ (self, tipo, y, id):
         super().__init__()
@@ -136,20 +155,22 @@ backgrounds = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_cars = pygame.sprite.Group()
 all_trains = pygame.sprite.Group()
+# all_treelog = pygame.sprite.Group()
 
 for i in range(-10, 10):
     bg = Background(random.choice(available_backgrounds), i * 150 , i)
+
     if bg.tipo in ['street', 'street2']:
         car_image = random.choice(available_cars)
         carro = Carro(bg.rect.y, 5, 1, assets[car_image])
         all_sprites.add(carro)
         all_cars.add(carro)
     
-    # if bg.tipo in ['railway']:
-    #     train_image = assets['train']
-    #     train = Train(bg.rect.y, 5, 1, assets[train_image])
-    #     all_sprites.add(train)
-    #     all_trains.add(train)
+    if bg.tipo in ['railway']:
+        train_image = assets['train']
+        train = Train(bg.rect.y, 5, 1, train_image)
+        all_sprites.add(train)
+        all_trains.add(train)
 
     backgrounds.add(bg)
 
@@ -203,24 +224,24 @@ while running:
                 all_sprites.add(carro)
                 all_cars.add(carro)
     
-    # novo_train = False
-    # kill_trains = False
-    # for train in all_trains:
-    #     if train.rect.left > WIDTH:
-    #         kill_trains = True
-    #         novo_train = True
-    # if kill_trains:
-    #     for train in all_trains:
-    #         train.kill()
-    #     kill_trains = False
-    # if novo_train:
-    #     novo_train = False    
-    #     for bg in backgrounds:
-    #         if bg.tipo in ['railway']:
-    #             train_image = assets['train']
-    #             train = Train(bg.rect.y, 5, 1, assets[train_image])
-    #             all_sprites.add(train)
-    #             all_trains.add(train)
+    novo_train = False
+    kill_trains = False
+    for train in all_trains:
+        if train.rect.left > WIDTH:
+            kill_trains = True
+            novo_train = True
+    if kill_trains:
+        for train in all_trains:
+            train.kill()
+        kill_trains = False
+    if novo_train:
+        novo_train = False    
+        for bg in backgrounds:
+            if bg.tipo in ['railway']:
+                train_image = assets['train']
+                train = Train(bg.rect.y, 5, 1, train_image)
+                all_sprites.add(train)
+                all_trains.add(train)
 
     novo_bg = False
     for bg in backgrounds:
@@ -244,11 +265,11 @@ while running:
             all_sprites.add(carro)
             all_cars.add(carro)
         
-        # if bg.tipo in ['railway']:
-        #     train_image = assets['train']
-        #     train = Train(bg.rect.y, 5, 1, train_image)
-        #     all_sprites.add(train)
-        #     all_trains.add(train)
+        if bg.tipo in ['railway']:
+            train_image = assets['train']
+            train = Train(bg.rect.y, 5, 1, train_image)
+            all_sprites.add(train)
+            all_trains.add(train)
 
         backgrounds.add(bg)
     

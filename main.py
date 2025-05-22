@@ -40,7 +40,7 @@ assets['tela_inicio'] = pygame.transform.scale(assets['tela_inicio'], (WIDTH, HE
 assets['tela_fim'] = pygame.image.load('Assets/tela_game_over2.png').convert_alpha()
 assets['tela_fim'] = pygame.transform.scale(assets['tela_fim'], (WIDTH, HEIGHT))
 
-available_backgrounds = ['railway', 'street2', 'water', 'street2']
+available_backgrounds = ['railway', 'street2', 'water']
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
 
 # Função para mostrar a tela inicial
@@ -229,6 +229,7 @@ def game():
     while running:
         clock.tick(FPS)
 
+
         # eventos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -245,6 +246,8 @@ def game():
                     player.move_by(-15, +40)
                 elif event.key == pygame.K_ESCAPE:
                     return True  # Voltar ao menu
+            
+        score += 1
         
         novo_carro = False
         kill_cars = False

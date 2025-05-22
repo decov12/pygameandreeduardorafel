@@ -1,6 +1,6 @@
 import pygame
 import random
-from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT, TRAIN_WIDTH, TRAIN_HEIGHT, GREEN2, TREE_LOG_WIDTH, TREE_LOG_HEIGHT,TRAIN_HITBOX_WIDTH, TRAIN_HITBOX_HEIGHT
+from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT, TRAIN_WIDTH, TRAIN_HEIGHT, GREEN2, TREE_LOG_WIDTH, TREE_LOG_HEIGHT,TRAIN_HITBOX_WIDTH, TRAIN_HITBOX_HEIGHT, CAR_HITBOX_WIDTH, CAR_HITBOX_HEIGHT
 
 # Iniciar pygame
 pygame.init()
@@ -116,22 +116,20 @@ class Player(pygame.sprite.Sprite):
 class Carro(pygame.sprite.Sprite):
     def __init__(self, y, vel_x, vel_y, image):
         super().__init__()
-        self.image = image
+        self.image = pygame.transform.scale(image, (CAR_WIDTH, CAR_HEIGHT))
         self.rect = self.image.get_rect()
+        self.hitbox = pygame.Rect(0, 0, CAR_HITBOX_WIDTH, CAR_HITBOX_HEIGHT)
         self.rect.y = y
         self.vel_y = vel_y
         self.vel_x = vel_x
         self.pos = y * 1.0
-        
-        if self.vel_x > 0:
-            self.rect.x = -self.rect.width  
-        else:
-            self.rect.x = WIDTH
-    
+        self.rect.x = -self.rect.width if self.vel_x > 0 else WIDTH
+
     def update(self):
         self.rect.x += self.vel_x
         self.pos += 1.5
         self.rect.y = self.pos
+        self.hitbox.center = self.rect.center
 
 class Train(pygame.sprite.Sprite):
     def __init__(self, y, vel_x, vel_y, image):
@@ -348,7 +346,11 @@ def game():
         backgrounds.update()
         player.update()
 
-        hits = pygame.sprite.spritecollide(player, all_cars, True)
+        hits = []
+        for car in all_cars:
+            if player.rect.colliderect(car.hitbox):
+                hits.append(car)
+                car.kill()
         hits2 = []
         for train in all_trains:
             if player.rect.colliderect(train.hitbox):

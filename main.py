@@ -94,7 +94,14 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH // 2
         self.rect.centery = HEIGHT // 2
-
+        self.is_jumping = False
+        self.jump_velocity_y = -(ROAD_HEIGHT/10)
+        self.jump_velocity_x = 0
+        self.gravity = 1
+        self.vel_y = 0
+        self.vel_x = 0
+        self.ground_y = self.rect.y
+    
     def move_by(self, dx, dy):
         self.rect.x += dx
         self.rect.y += dy
@@ -108,9 +115,36 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
+
+    def jump(self):
+
+        if not self.is_jumping:
+            self.is_jumping = True
+            self.vel_y = self.jump_velocity_y
+            self.vel_x = self.jump_velocity_x
+            scroll_speed = 2
+
+        # manter dentro da tela
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > HEIGHT:
+            self.rect.bottom = HEIGHT
         
     def update(self):
-        self.rect.y += 1
+        if self.is_jumping:
+            self.rect.y += self.vel_y
+            self.rect.x += self.vel_x
+            self.vel_y += self.gravity
+
+            if self.rect.y >= self.ground_y:
+                self.rect.y = self.ground_y
+                self.is_jumping = False
+                self.vel_y = 0
+                self.vel_x = 0
 
 # Classe carro
 class Carro(pygame.sprite.Sprite):
@@ -184,7 +218,7 @@ class Background(pygame.sprite.Sprite):
         self.rect.y = y
         self.rect.x = 0
         self.id = id
-        self.scroll_speed = 1
+        self.scroll_speed = 1.5
     
     def update(self):
         self.rect.y += self.scroll_speed
@@ -236,8 +270,8 @@ def game():
                 return False
 
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    player.move_by(+15, -40)
+                if event.key == pygame.K_SPACE:
+                    player.jump()
                 elif event.key == pygame.K_LEFT:
                     player.move_by(-30, -5)
                 elif event.key == pygame.K_RIGHT:

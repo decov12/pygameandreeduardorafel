@@ -60,11 +60,11 @@ def show_start_screen():
                     return True
 
 # Função para mostrar a tela de game over
-def show_game_over_screen(score, recorde):
+def show_game_over_screen(texto_score, recorde):
     window.blit(assets['tela_fim'], (0, 0))
     font = pygame.font.SysFont(None, 48)
 
-    text = font.render(f"Pontos: {score}", True, (255, 255, 255))
+    text = font.render(f"Pontos: {texto_score}", True, (255, 255, 255))
     window.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT - 210))
 
     text2 = font.render(f"Recorde: {recorde}", True, (255, 255, 0))
@@ -417,15 +417,15 @@ recorde = 0
 playing = True
 while playing:
     if show_start_screen():
-        score = game()
-        if score > recorde:
-            recorde = score
-        continuar = show_game_over_screen(score, recorde)
+        texto_score = game()
+        if texto_score > recorde:
+            recorde = texto_score
+        continuar = show_game_over_screen(texto_score, recorde)
         while continuar:
-            score = game()
-            if score > recorde:
-                recorde = score
-            continuar = show_game_over_screen(score, recorde)
+            texto_score = game()
+            if texto_score > recorde:
+                recorde = texto_score
+            continuar = show_game_over_screen(texto_score, recorde)
     else:
         playing = False
 

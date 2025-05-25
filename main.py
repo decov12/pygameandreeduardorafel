@@ -97,7 +97,7 @@ class Player(pygame.sprite.Sprite):
         self.is_jumping = False
         self.jump_velocity_y = -(ROAD_HEIGHT/10)
         self.jump_velocity_x = 0
-        self.gravity = 1
+        self.gravity = 1.2
         self.vel_y = 0
         self.vel_x = 0
         self.ground_y = self.rect.y
@@ -122,7 +122,7 @@ class Player(pygame.sprite.Sprite):
             self.is_jumping = True
             self.vel_y = self.jump_velocity_y
             self.vel_x = self.jump_velocity_x
-            scroll_speed = 2
+            scroll_speed = 10
 
         # manter dentro da tela
         if self.rect.left < 0:
@@ -218,7 +218,7 @@ class Background(pygame.sprite.Sprite):
         self.rect.y = y
         self.rect.x = 0
         self.id = id
-        self.scroll_speed = 1.5
+        self.scroll_speed = 1.2
     
     def update(self):
         self.rect.y += self.scroll_speed
@@ -226,6 +226,7 @@ class Background(pygame.sprite.Sprite):
 # Função principal do jogo
 def game():
     score = 0
+    start_ticks = pygame.time.get_ticks()
     backgrounds = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
     all_cars = pygame.sprite.Group()
@@ -263,7 +264,6 @@ def game():
     while running:
         clock.tick(FPS)
 
-
         # eventos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -281,7 +281,8 @@ def game():
                 elif event.key == pygame.K_ESCAPE:
                     return True  # Voltar ao menu
             
-        score += 1
+        seconds = (pygame.time.get_ticks() - start_ticks) / 1000
+        score = int(seconds * 2)
         
         novo_carro = False
         kill_cars = False
@@ -399,11 +400,16 @@ def game():
             return score
 
         # Desenhos
+        fonte = pygame.font.SysFont("Arial", 36)
+        texto_score = fonte.render(f"Pontos: {score}", True, (255, 255, 255))
         window.fill(GREEN2)
         backgrounds.draw(window)
         all_sprites.draw(window)
+        window.blit(texto_score, (10, 10))
+
         pygame.display.update()
-    
+
+
     return True
 
 # Loop principal do jogo
@@ -422,5 +428,6 @@ while playing:
             continuar = show_game_over_screen(score, recorde)
     else:
         playing = False
+
 
 pygame.quit()

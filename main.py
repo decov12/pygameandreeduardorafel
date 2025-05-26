@@ -5,6 +5,10 @@ from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_W
 
 # Iniciar pygame
 pygame.init()
+pygame.mixer.init()
+pygame.mixer.music.load('Assets\Bit Quest.mp3')  
+pygame.mixer.music.set_volume(0.5)  
+pygame.mixer.music.play(-1)
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Crossy Road 2.0")
 clock = pygame.time.Clock()

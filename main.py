@@ -227,13 +227,13 @@ def game():
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    player.move_by(+15, -40)
+                    player.move_by(+10, -37.5)
                 elif event.key == pygame.K_LEFT:
                     player.move_by(-30, -5)
                 elif event.key == pygame.K_RIGHT:
                     player.move_by(+30, +5)
                 elif event.key == pygame.K_DOWN:
-                    player.move_by(-15, +40)
+                    player.move_by(-10, +37.5)
                 elif event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()

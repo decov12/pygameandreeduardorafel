@@ -1,4 +1,3 @@
-
 import pygame
 import random
 from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT, TRAIN_WIDTH, TRAIN_HEIGHT, GREEN2,TRAIN_HITBOX_WIDTH, TRAIN_HITBOX_HEIGHT, CAR_HITBOX_WIDTH, CAR_HITBOX_HEIGHT
@@ -169,6 +168,9 @@ def game():
     all_cars = pygame.sprite.Group()
     all_trains = pygame.sprite.Group()
 
+    last_move_time = pygame.time.get_ticks()
+    INACTIVITY_TIMEOUT = 5000 
+
     ultimos_bg = []
     for i in range(-10, 10):
         tipo = random.choice(available_backgrounds)
@@ -194,27 +196,35 @@ def game():
             ultimos_bg.pop(0)
 
     player = Player(assets['player_image'])
+    player.rect.centery = 1 * 75 + 37.5
     all_sprites.add(player)
 
     running = True
     while running:
         clock.tick(FPS)
-
+        current_time = pygame.time.get_ticks()
+        if current_time - last_move_time > INACTIVITY_TIMEOUT:
+            return True 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
+                    last_move_time = pygame.time.get_ticks()  # Reset timer
                     player.move_by(+10, -37.5)
                 elif event.key == pygame.K_LEFT:
+                    last_move_time = pygame.time.get_ticks()  # Reset timer
                     player.move_by(-30, -5)
                 elif event.key == pygame.K_RIGHT:
+                    last_move_time = pygame.time.get_ticks()  # Reset timer
                     player.move_by(+30, +5)
                 elif event.key == pygame.K_DOWN:
+                    last_move_time = pygame.time.get_ticks()  # Reset timer
                     player.move_by(-10, +37.5)
+                
                 elif event.key == pygame.K_ESCAPE:
                     pygame.quit()
-                    exit()
+                    exit() 
         
         # Restante da função game() mantido exatamente igual
         novo_carro = False
@@ -263,8 +273,6 @@ def game():
                 novo_bg = True  
         if novo_bg:
             novo_bg = False
-
-        # Determina tipo do próximo background com base nos últimos 3
         # Determina tipo do próximo background com base nos últimos 3
         repetidos = set(ultimos_bg[-3:])
         if len(ultimos_bg) >= 3 and all(bg in ['street', 'street2'] for bg in ultimos_bg[-3:]):

@@ -1,7 +1,7 @@
 
 import pygame
 import random
-from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT, TRAIN_WIDTH, TRAIN_HEIGHT, GREEN2, TREE_LOG_WIDTH, TREE_LOG_HEIGHT,TRAIN_HITBOX_WIDTH, TRAIN_HITBOX_HEIGHT, CAR_HITBOX_WIDTH, CAR_HITBOX_HEIGHT
+from config import WIDTH, HEIGHT, WHITE, FPS, PLAYER_WIDTH, PLAYER_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ROAD_WIDTH, ROAD_HEIGHT, TRAIN_WIDTH, TRAIN_HEIGHT, GREEN2,TRAIN_HITBOX_WIDTH, TRAIN_HITBOX_HEIGHT, CAR_HITBOX_WIDTH, CAR_HITBOX_HEIGHT
 
 # Iniciar pygame
 pygame.init()
@@ -17,8 +17,6 @@ clock = pygame.time.Clock()
 assets = {}
 assets['player_image'] = pygame.image.load('Assets/Armature_jumping_left_1.png').convert_alpha()
 assets['player_image'] = pygame.transform.scale(assets['player_image'], (PLAYER_WIDTH, PLAYER_HEIGHT))
-assets['tree_log'] = pygame.image.load('Assets/objects/the wood.png').convert_alpha()
-assets['tree_log'] = pygame.transform.scale(assets['tree_log'], (TREE_LOG_WIDTH, TREE_LOG_HEIGHT))
 assets['background'] = pygame.image.load('Assets/Game Level.png').convert_alpha()
 assets['player_image_right'] = pygame.image.load('Assets/Armature_jumping_right_1.png').convert_alpha()
 assets['player_image_right'] = pygame.transform.scale(assets['player_image_right'], (PLAYER_WIDTH, PLAYER_HEIGHT))
@@ -36,16 +34,16 @@ assets['street'] = pygame.image.load('Assets/Roads/Street1.2.png').convert_alpha
 assets['street'] = pygame.transform.scale(assets['street'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['street2'] = pygame.image.load('Assets/Roads/Street2.2.png').convert_alpha()
 assets['street2'] = pygame.transform.scale(assets['street2'], (ROAD_WIDTH, ROAD_HEIGHT))
-assets['water'] = pygame.image.load('Assets/Roads/Water2.png').convert_alpha()
-assets['water'] = pygame.transform.scale(assets['water'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['train'] = pygame.image.load('Assets/train front.png').convert_alpha()
 assets['train'] = pygame.transform.scale(assets['train'], (TRAIN_WIDTH, TRAIN_HEIGHT))
 assets['tela_inicio'] = pygame.image.load('Assets/tela_inicial.png').convert_alpha()
 assets['tela_inicio'] = pygame.transform.scale(assets['tela_inicio'], (WIDTH, HEIGHT))
 assets['tela_fim'] = pygame.image.load('Assets/tela_game_over2.png').convert_alpha()
 assets['tela_fim'] = pygame.transform.scale(assets['tela_fim'], (WIDTH, HEIGHT))
+assets['grass']=pygame.image.load('Assets/Roads/Grass.png').convert_alpha()
+assets['grass'] = pygame.transform.scale(assets['grass'], (ROAD_WIDTH, ROAD_HEIGHT))
 
-available_backgrounds = ['railway', 'street2', 'water', 'street2']
+available_backgrounds = ['railway', 'street2','grass']
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
 
 # Função para mostrar a tela inicial (modificada para ESC fechar)
@@ -150,26 +148,6 @@ class Train(pygame.sprite.Sprite):
         self.rect.y = self.pos
         self.hitbox.center = self.rect.center
 
-class Tree_log(pygame.sprite.Sprite):
-    def __init__(self, y, vel_x, vel_y, image):
-        super().__init__()
-        self.image = image
-        self.rect = self.image.get_rect()
-        self.rect.y = y
-        self.vel_y = vel_y
-        self.vel_x = vel_x
-        self.pos = y * 1.0
-        
-        if self.vel_x > 0:
-            self.rect.x = -self.rect.width  
-        else:
-            self.rect.x = WIDTH
-    
-    def update(self):
-        self.rect.x += self.vel_x
-        self.pos += 1.5
-        self.rect.y = self.pos
-
 class Background(pygame.sprite.Sprite):
     def __init__(self, tipo, y, id):
         super().__init__()
@@ -190,10 +168,9 @@ def game():
     all_sprites = pygame.sprite.Group()
     all_cars = pygame.sprite.Group()
     all_trains = pygame.sprite.Group()
-    all_tree_log = pygame.sprite.Group()
 
     for i in range(-10, 10):
-        bg = Background(random.choice(available_backgrounds), i * 150, i)
+        bg = Background(random.choice(available_backgrounds), i * 75, i)
 
         if bg.tipo in ['street', 'street2']:
             car_image = random.choice(available_cars)
@@ -206,12 +183,6 @@ def game():
             train = Train(bg.rect.y, 5, 1, train_image)
             all_sprites.add(train)
             all_trains.add(train)
-        
-        if bg.tipo in ['water']:
-            tree_log_image = assets['tree_log']
-            tree_log = Tree_log(bg.rect.y, 5, 1, tree_log_image)
-            all_sprites.add(tree_log)
-            all_tree_log.add(tree_log)
 
         backgrounds.add(bg)
 
@@ -278,25 +249,6 @@ def game():
                     all_trains.add(train)
             novo_train = False
 
-        novo_tree_log = False
-        kill_tree_log = False
-        for tree_log in all_tree_log:
-            if tree_log.rect.left > WIDTH:
-                kill_tree_log = True
-                novo_tree_log = True
-        if kill_tree_log:
-            for tree_log in all_tree_log:
-                tree_log.kill()
-            kill_tree_log = False
-        if novo_tree_log:
-            novo_tree_log = False    
-            for bg in backgrounds:
-                if bg.tipo in ['water']:
-                    tree_log_image = assets['tree_log']
-                    tree_log = Tree_log(bg.rect.y, 5, 1, tree_log_image)
-                    all_sprites.add(tree_log)
-                    all_tree_log.add(tree_log)
-
         novo_bg = False
         for bg in backgrounds:
             if bg.rect.bottom > HEIGHT + 150:
@@ -324,17 +276,10 @@ def game():
                 all_sprites.add(train)
                 all_trains.add(train)
             
-            if bg.tipo in ['water']:
-                tree_log_image = assets['tree_log']
-                tree_log = Tree_log(bg.rect.y, 5, 1, tree_log_image)
-                all_sprites.add(tree_log)
-                all_tree_log.add(tree_log)
-
             backgrounds.add(bg)
         
         all_cars.update()
         all_trains.update()
-        all_tree_log.update()
         backgrounds.update()
         player.update()
 

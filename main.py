@@ -169,8 +169,10 @@ def game():
     all_cars = pygame.sprite.Group()
     all_trains = pygame.sprite.Group()
 
+    ultimos_bg = []
     for i in range(-10, 10):
-        bg = Background(random.choice(available_backgrounds), i * 75, i)
+        tipo = random.choice(available_backgrounds)
+        bg = Background(tipo, i * 75, i)
 
         if bg.tipo in ['street', 'street2']:
             car_image = random.choice(available_cars)
@@ -185,6 +187,11 @@ def game():
             all_trains.add(train)
 
         backgrounds.add(bg)
+        if len(ultimos_bg) < 3:
+            ultimos_bg.append(tipo)
+        else:
+            ultimos_bg.append(tipo)
+            ultimos_bg.pop(0)
 
     player = Player(assets['player_image'])
     all_sprites.add(player)
@@ -256,27 +263,45 @@ def game():
                 novo_bg = True  
         if novo_bg:
             novo_bg = False
+
+        # Determina tipo do próximo background com base nos últimos 3
+        # Determina tipo do próximo background com base nos últimos 3
+        repetidos = set(ultimos_bg[-3:])
+        if len(ultimos_bg) >= 3 and all(bg in ['street', 'street2'] for bg in ultimos_bg[-3:]):
+            bg_image = 'grass'
+        elif len(ultimos_bg) >= 3 and all(bg == 'grass' for bg in ultimos_bg[-3:]):
+            bg_image = random.choice(['street', 'street2', 'railway'])
+        elif len(ultimos_bg) >= 3 and all(bg == 'railway' for bg in ultimos_bg[-3:]):
+            bg_image = 'grass'
+        else:
             bg_image = random.choice(available_backgrounds)
-            max_y = 0
-            for back in backgrounds:
-                if max_y > back.rect.y:
-                    max_y = back.rect.y
-            y = max_y - 150
-            bg = Background(random.choice(available_backgrounds), y, "novo")
-            
-            if bg.tipo in ['street', 'street2']:
-                car_image = random.choice(available_cars)
-                carro = Carro(bg.rect.y, 5, 1, assets[car_image])
-                all_sprites.add(carro)
-                all_cars.add(carro)
-            
-            if bg.tipo in ['railway']:
-                train_image = assets['train']
-                train = Train(bg.rect.y, 5, 1, train_image)
-                all_sprites.add(train)
-                all_trains.add(train)
-            
-            backgrounds.add(bg)
+
+
+        # Atualiza ultimos_bg
+        backgrounds.add(bg)
+        ultimos_bg.append(bg_image)
+        if len(ultimos_bg) > 3:
+            ultimos_bg.pop(0)
+
+
+    # Corrige max_y (mínimo y entre backgrounds)
+        max_y = min(back.rect.y for back in backgrounds)
+        y = max_y - 75
+
+        bg = Background(bg_image, y, "novo")
+
+        if bg.tipo in ['street', 'street2']:
+            car_image = random.choice(available_cars)
+            carro = Carro(bg.rect.y, 5, 1, assets[car_image])
+            all_sprites.add(carro)
+            all_cars.add(carro)
+
+        elif bg.tipo == 'railway':
+            train = Train(bg.rect.y, 5, 1, assets['train'])
+            all_sprites.add(train)
+            all_trains.add(train)
+
+        backgrounds.add(bg)
         
         all_cars.update()
         all_trains.update()

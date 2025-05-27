@@ -50,6 +50,14 @@ available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
 
 # Função para mostrar a tela inicial (modificada para ESC fechar)
 def show_start_screen():
+
+    """
+    Exibe a tela inicial do jogo e espera interação do jogador.
+
+    Retorna:
+        bool: True se o jogo deve começar, False se o jogador sair.
+    """
+
     window.blit(assets['tela_inicio'], (0, 0)) 
     pygame.display.flip()
     while True:
@@ -65,6 +73,16 @@ def show_start_screen():
 
 # Função para mostrar a tela de game over (modificada conforme pedido)
 def show_game_over_screen():
+
+    """
+    Exibe a tela de Game Over por tempo indefinido até que o jogador decida.
+
+    Retorna:
+        bool: 
+            - True se o jogador pressionar 'R' para retornar ao menu inicial.
+            - False se o jogador pressionar 'ESC' ou fechar a janela.
+    """
+
     window.blit(assets['tela_fim'], (0, 0))
     font = pygame.font.SysFont(None, 48)
 
@@ -84,8 +102,13 @@ def show_game_over_screen():
                 elif event.key == pygame.K_ESCAPE:
                     return False  # sair
 
-# Restante do código mantido exatamente igual
 class Player(pygame.sprite.Sprite):
+
+    """
+    Classe que representa o jogador (cachorro).
+    Controla movimentação, limites da tela e atualização da posição.
+    """
+
     def __init__(self, image):
         super().__init__()
         self.image = assets['player_image']
@@ -111,7 +134,34 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += 1
 
 class Carro(pygame.sprite.Sprite):
+
+    """
+    Classe que representa um carro no jogo.
+
+    Um carro se move horizontalmente (da esquerda para a direita ou vice-versa) 
+    e possui uma hitbox reduzida para colisões mais precisas com o jogador.
+
+    Atributos:
+        image (Surface): imagem escalada do carro.
+        rect (Rect): retângulo de posição do sprite.
+        hitbox (Rect): hitbox menor que o retângulo do sprite para colisões.
+        vel_x (int): velocidade horizontal.
+        vel_y (int): velocidade vertical (pode ser usada para rolagem).
+        pos (float): posição vertical usada para atualização suave.
+    """
+
     def __init__(self, y, vel_x, vel_y, image):
+
+        """
+        Inicializa um carro com imagem, posição e velocidade.
+
+        Args:
+            y (int): posição vertical inicial.
+            vel_x (int): velocidade horizontal (positiva ou negativa).
+            vel_y (int): velocidade vertical (geralmente 1, para scroll).
+            image (Surface): imagem do carro a ser renderizada.
+        """
+
         super().__init__()
         self.image = pygame.transform.scale(image, (CAR_WIDTH, CAR_HEIGHT))
         self.rect = self.image.get_rect()
@@ -123,6 +173,15 @@ class Carro(pygame.sprite.Sprite):
         self.rect.x = -self.rect.width if self.vel_x > 0 else WIDTH
 
     def update(self):
+
+        """
+        Atualiza a posição do carro na tela.
+
+        Move o carro horizontalmente com base na velocidade
+        e atualiza a posição vertical simulando o scroll do mapa.
+        Também reposiciona a hitbox para acompanhar o carro.
+        """
+
         self.rect.x += self.vel_x
         self.pos += 1.5
         self.rect.y = self.pos
@@ -130,6 +189,13 @@ class Carro(pygame.sprite.Sprite):
 
 class Train(pygame.sprite.Sprite):
     def __init__(self, y, vel_x, vel_y, image):
+
+        """
+    Classe que representa um trem no jogo.
+
+    O trem se move horizontalmente com velocidade definida
+    e possui uma hitbox específica para detectar colisões.
+    """
         super().__init__()
         self.image = pygame.transform.scale(image, (TRAIN_WIDTH, TRAIN_HEIGHT))
         self.rect = self.image.get_rect()
@@ -145,13 +211,30 @@ class Train(pygame.sprite.Sprite):
             self.rect.x = WIDTH
     
     def update(self):
+        """Atualiza a posição do trem e da hitbox."""
         self.rect.x += self.vel_x
         self.pos += 1.5
         self.rect.y = self.pos
         self.hitbox.center = self.rect.center
 
 class Background(pygame.sprite.Sprite):
+    """
+    Classe que representa uma faixa do terreno (background) no jogo.
+
+    Pode ser grama, rua ou trilho. Serve de base para definir o tipo de
+    obstáculo ou segurança da linha, e se move verticalmente com o mapa.
+    """
+
     def __init__(self, tipo, y, id):
+        """
+        Inicializa a faixa de background com o tipo, posição e identificador.
+
+        Args:
+            tipo (str): tipo do terreno ('grass', 'street', 'street2' ou 'railway').
+            y (int): posição vertical inicial no mapa.
+            id (int or str): identificador único da linha (pode ser o índice no mapa).
+        """
+
         super().__init__()
         self.image = assets[tipo]
         self.rect = self.image.get_rect()
@@ -162,15 +245,50 @@ class Background(pygame.sprite.Sprite):
         self.scroll_speed = 1
     
     def update(self):
+        """
+        Atualiza a posição vertical do terreno, simulando movimento do mundo.
+        """
+
         self.rect.y += self.scroll_speed
 
 def eh_rua(bg):
+    """
+    Verifica se o tipo de background corresponde a uma rua.
+
+    Args:
+        bg (str): tipo do terreno.
+
+    Returns:
+        bool: True se for uma rua, False caso contrário.
+    """
+
     return bg in ['street', 'street2']
 
 def eh_perigoso(bg):
+    """
+    Verifica se o tipo de background representa perigo ao jogador.
+
+    Args:
+        bg (str): tipo do terreno.
+
+    Returns:
+        bool: True se for rua ou trilho, False se for seguro.
+    """
+
     return bg in ['street', 'street2', 'railway']
 
 def game():
+    """
+    Executa a lógica principal do jogo em uma única rodada.
+
+    Controla o jogador, gera terrenos, obstáculos (carros e trens),
+    verifica colisões e trata o encerramento da partida por inatividade
+    ou por batida. Também atualiza e desenha os elementos na tela.
+    
+    Returns:
+        bool: True se o jogo terminou com Game Over, False se o jogador sair diretamente.
+    """
+
     score = 0
     backgrounds = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
@@ -247,7 +365,6 @@ def game():
                     pygame.quit()
                     exit() 
         
-        # Restante da função game() mantido exatamente igual
         novo_carro = False
         kill_cars = False
         for car in all_cars:
@@ -303,13 +420,13 @@ def game():
         gramas_seguidas = all(bg == 'grass' for bg in ultimos_tipos)
 
         if len(ultimos_tipos) >= 3 and ruas_seguidas:
-            bg_image = 'grass'
+            bg_image = 'grass' #define que o proximo é grama
         elif len(ultimos_tipos) >= 3 and perigo_extremo:
-            bg_image = 'grass'
+            bg_image = 'grass' #define que o proximo é grama
         elif len(ultimos_tipos) >= 3 and trilhos_seguidos:
-            bg_image = 'grass'
+            bg_image = 'grass' #define que o proximo é grama
         elif len(ultimos_tipos) >= 3 and gramas_seguidas:
-            bg_image = random.choice(['street', 'street2', 'railway'])
+            bg_image = random.choice(['street', 'street2', 'railway']) #define que o proximo é rua ou trem
         else:
             bg_image = random.choice(available_backgrounds)
 
@@ -341,17 +458,21 @@ def game():
         backgrounds.update()
         player.update()
 
+        # colisao com o carro
         hits = []
         for car in all_cars:
             if player.rect.colliderect(car.hitbox):
                 hits.append(car)
                 car.kill()
+
+        # colisao com o trem
         hits2 = []
         for train in all_trains:
             if player.rect.colliderect(train.hitbox):
                 hits2.append(train)
                 train.kill()
 
+        # animacao para quando morre
         if hits or hits2:
             assets['car crash'].play()
             player.image = assets['player_dead']
@@ -369,7 +490,7 @@ def game():
     
     return True
 
-# Loop principal do jogo (modificado para remover recorde e pontos)
+# Loop principal do jogo (definindo quando é tela de ínicio, a de jogo e o fim)
 playing = True
 while playing:
     if show_start_screen():

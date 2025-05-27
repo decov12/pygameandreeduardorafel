@@ -41,6 +41,8 @@ assets['tela_fim'] = pygame.image.load('Assets/tela_game_over2.png').convert_alp
 assets['tela_fim'] = pygame.transform.scale(assets['tela_fim'], (WIDTH, HEIGHT))
 assets['grass']=pygame.image.load('Assets/Roads/Grass.png').convert_alpha()
 assets['grass'] = pygame.transform.scale(assets['grass'], (ROAD_WIDTH, ROAD_HEIGHT))
+assets['car crash']= pygame.mixer.Sound("Assets/car-crash_A_minor.wav")
+
 
 available_backgrounds = ['railway', 'street2','grass']
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
@@ -341,6 +343,7 @@ def game():
                 train.kill()
 
         if hits or hits2:
+            assets['car crash'].play()
             return True
 
         window.fill(GREEN2)

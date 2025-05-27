@@ -11,7 +11,6 @@ Um jogo desenvolvido com Python e Pygame inspirado no jogo Crossy Road, onde o j
 ```
 crossy_dog/
 ├── main.py                # Arquivo principal que roda o jogo
-├── sprites.py             # Classes de sprites (Player, Carro, Trem, etc.)
 ├── config.py              # Constantes e tamanhos da tela e sprites
 ├── assets.py              # Carregamento de imagens e sons
 ├── Assets/                # Pasta com imagens e sons usados no jogo

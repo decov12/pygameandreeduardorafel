@@ -161,6 +161,12 @@ class Background(pygame.sprite.Sprite):
     def update(self):
         self.rect.y += self.scroll_speed
 
+def eh_rua(bg):
+    return bg in ['street', 'street2']
+
+def eh_perigoso(bg):
+    return bg in ['street', 'street2', 'railway']
+
 def game():
     score = 0
     backgrounds = pygame.sprite.Group()
@@ -169,7 +175,7 @@ def game():
     all_trains = pygame.sprite.Group()
 
     last_move_time = pygame.time.get_ticks()
-    INACTIVITY_TIMEOUT = 5000 
+    INACTIVITY_TIMEOUT = 6000 
 
     ultimos_bg = []
     for i in range(-10, 10):
@@ -274,29 +280,29 @@ def game():
         if novo_bg:
             novo_bg = False
         # Determina tipo do próximo background com base nos últimos 3
-        repetidos = set(ultimos_bg[-3:])
-        if len(ultimos_bg) >= 3 and all(bg in ['street', 'street2'] for bg in ultimos_bg[-3:]):
+        ultimos_tipos = ultimos_bg[-3:]
+
+        ruas_seguidas = all(eh_rua(bg) for bg in ultimos_tipos)
+        perigo_extremo = all(eh_perigoso(bg) for bg in ultimos_tipos)
+        trilhos_seguidos = all(bg == 'railway' for bg in ultimos_tipos)
+        gramas_seguidas = all(bg == 'grass' for bg in ultimos_tipos)
+
+        if len(ultimos_tipos) >= 3 and ruas_seguidas:
             bg_image = 'grass'
-        elif len(ultimos_bg) >= 3 and all(bg == 'grass' for bg in ultimos_bg[-3:]):
+        elif len(ultimos_tipos) >= 3 and perigo_extremo:
+            bg_image = 'grass'
+        elif len(ultimos_tipos) >= 3 and trilhos_seguidos:
+            bg_image = 'grass'
+        elif len(ultimos_tipos) >= 3 and gramas_seguidas:
             bg_image = random.choice(['street', 'street2', 'railway'])
-        elif len(ultimos_bg) >= 3 and all(bg == 'railway' for bg in ultimos_bg[-3:]):
-            bg_image = 'grass'
         else:
             bg_image = random.choice(available_backgrounds)
 
 
-        # Atualiza ultimos_bg
-        backgrounds.add(bg)
-        ultimos_bg.append(bg_image)
-        if len(ultimos_bg) > 3:
-            ultimos_bg.pop(0)
-
-
-    # Corrige max_y (mínimo y entre backgrounds)
         max_y = min(back.rect.y for back in backgrounds)
         y = max_y - 75
-
         bg = Background(bg_image, y, "novo")
+        backgrounds.add(bg)
 
         if bg.tipo in ['street', 'street2']:
             car_image = random.choice(available_cars)
@@ -308,6 +314,10 @@ def game():
             train = Train(bg.rect.y, 5, 1, assets['train'])
             all_sprites.add(train)
             all_trains.add(train)
+        
+        ultimos_bg.append(bg_image)
+        if len(ultimos_bg) > 3:
+            ultimos_bg.pop(0)
 
         backgrounds.add(bg)
         

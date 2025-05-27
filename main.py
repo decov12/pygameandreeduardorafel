@@ -216,6 +216,15 @@ def game():
         clock.tick(FPS)
         current_time = pygame.time.get_ticks()
         if current_time - last_move_time > INACTIVITY_TIMEOUT:
+            player.image = assets['player_dead']
+    
+    # desenha a tela parada com o cachorro caído
+            window.fill(GREEN2)
+            backgrounds.draw(window)
+            all_sprites.draw(window)
+            pygame.display.update()
+    
+            pygame.time.delay(1000)
             return True 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

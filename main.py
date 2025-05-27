@@ -179,7 +179,10 @@ def game():
 
     ultimos_bg = []
     for i in range(-10, 10):
-        tipo = random.choice(available_backgrounds)
+        if -1 <= i <= 1:
+            tipo = 'grass'  # força os 3 terrenos centrais a serem seguros
+        else:
+            tipo = random.choice(available_backgrounds)
         bg = Background(tipo, i * 75, i)
 
         if bg.tipo in ['street', 'street2']:

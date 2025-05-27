@@ -42,7 +42,8 @@ assets['tela_fim'] = pygame.transform.scale(assets['tela_fim'], (WIDTH, HEIGHT))
 assets['grass']=pygame.image.load('Assets/Roads/Grass.png').convert_alpha()
 assets['grass'] = pygame.transform.scale(assets['grass'], (ROAD_WIDTH, ROAD_HEIGHT))
 assets['car crash']= pygame.mixer.Sound("Assets/car-crash_A_minor.wav")
-
+assets['player_dead'] = pygame.image.load('Assets/player_dead.png').convert_alpha()
+assets['player_dead'] = pygame.transform.scale(assets['player_dead'], (PLAYER_WIDTH+50, PLAYER_HEIGHT+20))
 
 available_backgrounds = ['railway', 'street2','grass']
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']
@@ -344,6 +345,12 @@ def game():
 
         if hits or hits2:
             assets['car crash'].play()
+            player.image = assets['player_dead']
+            window.fill(GREEN2)
+            backgrounds.draw(window)
+            all_sprites.draw(window)
+            pygame.display.update()
+            pygame.time.delay(1000)  # espera 1 segundo
             return True
 
         window.fill(GREEN2)

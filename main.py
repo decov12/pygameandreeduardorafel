@@ -42,11 +42,11 @@ assets['train'] = pygame.transform.scale(assets['train'], (TRAIN_WIDTH, TRAIN_HE
 playing = True
 while playing:
     if show_start_screen(window, clock):
-        game_over = game()
-        if not game_over:
+        game_over_score = game()
+        if game_over_score is False:
             playing = False  
         else:
-            continuar = show_game_over_screen()
+            continuar = show_game_over_screen(game_over_score)
             if not continuar:
                 playing = False  
             while continuar:

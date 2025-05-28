@@ -119,7 +119,7 @@ def game():
             pygame.display.update()
     
             pygame.time.delay(1000)
-            return True 
+            return player.pontos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
@@ -262,7 +262,7 @@ def game():
             with open("leaderboard.txt", "a") as f:
                 f.write(f"{player.pontos}\n")
             
-            return True
+            return player.pontos
         window.fill(GREEN2)
         backgrounds.draw(window)
         all_sprites.draw(window)

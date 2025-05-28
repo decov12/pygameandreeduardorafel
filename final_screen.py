@@ -14,7 +14,7 @@ pygame.display.set_caption("Crossy Road 2.0")
 clock = pygame.time.Clock()
 
 # Função para mostrar a tela de game over (modificada conforme pedido)
-def show_game_over_screen():
+def show_game_over_screen(pontos):
 
     """
     Exibe a tela de Game Over por tempo indefinido até que o jogador decida.
@@ -30,7 +30,8 @@ def show_game_over_screen():
 
     text3 = font.render("R - Menu Inicial | ESC - Sair", True, (200, 200, 200))
     window.blit(text3, (WIDTH // 2 - text3.get_width() // 2, HEIGHT - 110))
-
+    score_text = font.render(f"Pontuação: {pontos}", True, (255, 255, 255))
+    window.blit(score_text, (WIDTH // 2 - score_text.get_width() // 2, HEIGHT // 2 - 50))
     pygame.display.flip()
 
     while True:

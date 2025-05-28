@@ -68,3 +68,10 @@ Exigências:
   - https://opengameart.org
   - https://kenney.nl/assets
 
+
+  ## Vídeo Explicativo
+
+  https://youtu.be/cnGQBI-Jevw
+  
+
+

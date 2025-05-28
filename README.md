@@ -11,7 +11,10 @@ Um jogo desenvolvido com Python e Pygame inspirado no jogo Crossy Road, onde o j
 ```
 crossy_dog/
 ├── main.py                # Arquivo principal que roda o jogo
-├── config.py              # Constantes e tamanhos da tela e sprites
+├── config.py             # Constantes e tamanhos da tela e sprites
+├── funcoes.py             # Funções do jogo
+├── init_screen.py        # Função da tela de início do jogo
+├── final_screen.py       # Função da tela de game over
 ├── assets.py              # Carregamento de imagens e sons
 ├── Assets/                # Pasta com imagens e sons usados no jogo
 │   ├── Armature_jumping_left_1.png

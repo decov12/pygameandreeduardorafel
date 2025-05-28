@@ -26,17 +26,10 @@ class Player(pygame.sprite.Sprite):
         self.pontos = 0
 
     def move_by(self, dx, dy):
-        # Atualiza a posição
         self.rect.x += dx
         self.rect.y += dy
 
-        # Atualiza pontuação com base no movimento vertical
-        if dy < 0:
-            self.pontos += 1
-        elif dy > 0:
-            self.pontos -= 1
-
-        # Mantém o jogador dentro da tela
+        # Mantém dentro da tela
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > WIDTH:
@@ -45,6 +38,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
+
+
 
         
     def update(self):

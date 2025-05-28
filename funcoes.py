@@ -125,8 +125,22 @@ def game():
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    last_move_time = pygame.time.get_ticks()  # Reset timer
+                    last_move_time = pygame.time.get_ticks()
                     player.move_by(+10, -37.5)
+                    player.pontos += 1  # soma ponto ao subir
+
+                elif event.key == pygame.K_DOWN:
+                    last_move_time = pygame.time.get_ticks()
+                    player.move_by(-10, +37.5)
+                    player.pontos = max(0, player.pontos - 1)  # perde ponto, mínimo zero
+
+                elif event.key == pygame.K_LEFT:
+                    last_move_time = pygame.time.get_ticks()
+                    player.move_by(-30, -5)  # não altera pontos
+
+                elif event.key == pygame.K_RIGHT:
+                    last_move_time = pygame.time.get_ticks()
+                    player.move_by(+30, +5)  # não altera pontos
                 elif event.key == pygame.K_LEFT:
                     last_move_time = pygame.time.get_ticks()  # Reset timer
                     player.move_by(-30, -5)

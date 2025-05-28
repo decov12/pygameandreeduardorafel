@@ -41,28 +41,17 @@ assets['train'] = pygame.transform.scale(assets['train'], (TRAIN_WIDTH, TRAIN_HE
 # Loop principal do jogo
 playing = True
 while playing:
-    if show_start_screen(window, clock):
-        game_over_score = game()
-        if game_over_score is False:
-            playing = False  
-        else:
-            continuar = show_game_over_screen(game_over_score)
-            if not continuar:
-                playing = False  
-            while continuar:
-                if show_start_screen(window, clock):
-                    game_over = game()
-                    if not game_over:
-                        playing = False  
-                        continuar = False
-                    else:
-                        continuar = show_game_over_screen(window, clock)
-                        if not continuar:
-                            playing = False  
-                else:
-                    continuar = False
-                    playing = False  
-    else:
-        playing = False  
+    if not show_start_screen(window, clock):
+        break  # saiu da tela inicial
+
+    score = game()
+    if score is False:
+        break  # jogador saiu durante o jogo
+
+    continuar = show_game_over_screen(score)
+    if not continuar:
+        break  # jogador não quis continuar
+ 
 
 pygame.quit()
+playing

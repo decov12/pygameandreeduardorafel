@@ -1,5 +1,5 @@
 import pygame
-from assets import *
+from assets import assets
 from classes import *
 from funcoes import *
 

@@ -13,9 +13,9 @@ pygame.mixer.music.play(-1)
 pygame.display.set_caption("Crossy Road 2.0")
 clock = pygame.time.Clock()
 
-from assets import *
+from assets import assets
 from classes import *
-import assets
+
 
 available_backgrounds = ['railway', 'street2','grass']
 available_cars = ['car_black', 'car_blue', 'car_brown', 'car_red']

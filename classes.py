@@ -6,8 +6,8 @@ pygame.init()
 pygame.mixer.init()
 import random
 import os
-from assets import *
-import assets
+from assets import assets
+
 
 
 class Player(pygame.sprite.Sprite):

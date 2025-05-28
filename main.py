@@ -46,7 +46,7 @@ while playing:
         if not game_over:
             playing = False  
         else:
-            continuar = show_game_over_screen(window, clock)
+            continuar = show_game_over_screen()
             if not continuar:
                 playing = False  
             while continuar:

@@ -111,6 +111,11 @@ def game():
             window.fill(GREEN2)
             backgrounds.draw(window)
             all_sprites.draw(window)
+                        # Exibe a pontuação na tela
+            font = pygame.font.SysFont(None, 36)
+            score_surface = font.render(f"Pontos: {player.pontos}", True, (255, 255, 255))
+            window.blit(score_surface, (10, 10))
+
             pygame.display.update()
     
             pygame.time.delay(1000)
@@ -252,11 +257,21 @@ def game():
             all_sprites.draw(window)
             pygame.display.update()
             pygame.time.delay(1000)  # espera 1 segundo
+            
+                        # salva score ao morrer
+            with open("leaderboard.txt", "a") as f:
+                f.write(f"{player.pontos}\n")
+            
             return True
-
         window.fill(GREEN2)
         backgrounds.draw(window)
         all_sprites.draw(window)
+        font = pygame.font.SysFont(None, 36)
+        score_surface = font.render(f"Pontos: {player.pontos}", True, (255, 255, 255))
+        window.blit(score_surface, (10, 10))
+
+
+
         pygame.display.update()
     
     return True
